@@ -22,9 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -198,7 +200,9 @@ public class MainActivity extends AppCompatActivity {
         double lat = location.getLatitude();
         double lon = location.getLongitude();
 
-
+        if(map != null){
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 18));
+        }
 
     }
 
