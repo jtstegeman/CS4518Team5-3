@@ -42,6 +42,13 @@ public class BackgroundService extends Service implements SensorEventListener{
     private static final String EXTRA_FULLER = "Fuller";
     private static final String EXTRA_GORDON = "Gordon Library";
 
+    public static final double fullerLon =-71.806681;
+    public static final double fullerLat =42.274879;
+    public static final double libraryLon =-71.806660;
+    public static final double libraryLat =42.274249;
+
+    public static final int geoRadius = 5;
+
     public ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
     private final IBinder mBinder = new BackgroundBinder();
     private SensorManager sensorManager;
@@ -123,7 +130,7 @@ public class BackgroundService extends Service implements SensorEventListener{
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
         builder.addGeofence(new Geofence.Builder()
                 .setRequestId(GORDON)
-                .setCircularRegion(42.274249, -71.806660,5)
+                .setCircularRegion(libraryLat, libraryLon, geoRadius)
                 //Front door of Library
                 .setExpirationDuration(1000).setNotificationResponsiveness(0)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
@@ -131,7 +138,7 @@ public class BackgroundService extends Service implements SensorEventListener{
                 .build());
         builder.addGeofence(new Geofence.Builder()
                 .setRequestId(FULLER)
-                .setCircularRegion(42.274879, -71.806681,5)
+                .setCircularRegion(fullerLat, fullerLon, geoRadius)
                 //Front door of Fuller
                 .setExpirationDuration(1000).setNotificationResponsiveness(0)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |

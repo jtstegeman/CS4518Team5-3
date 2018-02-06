@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.concurrent.Executors;
@@ -106,6 +107,17 @@ public class MainActivity extends AppCompatActivity {
                 googleMap.setMyLocationEnabled(true);
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setBuildingsEnabled(true);
+
+                CircleOptions fullerLoc = new CircleOptions();
+                fullerLoc.center(new LatLng(BackgroundService.fullerLat,BackgroundService.fullerLon));
+                fullerLoc.radius(BackgroundService.geoRadius);
+                googleMap.addCircle(fullerLoc);
+
+                CircleOptions libraryLoc = new CircleOptions();
+                libraryLoc.center(new LatLng(BackgroundService.libraryLat,BackgroundService.libraryLon));
+                libraryLoc.radius(BackgroundService.geoRadius);
+                googleMap.addCircle(libraryLoc);
+
                 map = googleMap;
             }
         });
