@@ -39,14 +39,11 @@ public class BackgroundService extends Service implements SensorEventListener{
     public static final String FULLER = "Fuller";
     public static final String GORDON = "Gordon Library";
 
-    private static final String EXTRA_STEPS = "steps";
     private static final String EXTRA_FULLER = "Fuller";
     private static final String EXTRA_GORDON = "Gordon Library";
 
     public ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
     private final IBinder mBinder = new BackgroundBinder();
-    private float markedSteps=0;
-    private float lastSteps=0;
     private SensorManager sensorManager;
     private ActivityRecognitionClient mActivityRecognitionClient;
     private PendingIntent mPendingIntent;
@@ -60,9 +57,8 @@ public class BackgroundService extends Service implements SensorEventListener{
     private Set<String> geoIn = new HashSet<>();
     private Map<String, Integer> entryCounts = new HashMap<>();
 
-    public static Intent makeIntent(Context packageContext, float startSteps, int fullerEntryCount, int gordonEntryCount) {
+    public static Intent makeIntent(Context packageContext, int fullerEntryCount, int gordonEntryCount) {
         Intent intent = new Intent(packageContext, BackgroundService.class);
-        intent.putExtra(EXTRA_STEPS, startSteps);
         intent.putExtra(EXTRA_FULLER, fullerEntryCount);
         intent.putExtra(EXTRA_GORDON, gordonEntryCount);
         return intent;
@@ -101,7 +97,8 @@ public class BackgroundService extends Service implements SensorEventListener{
                     ArrayList<String> in = intent.getStringArrayListExtra("in");
                     for (String s : in){
                         if (!geoIn.contains(s)){
-                            markSteps();
+                            StepCounter.getInstance().calibrate(StepCounter.getInstance().getRawSteps());
+                            StepCounter.getInstance().setCalibrated(true);
                             Toast.makeText(BackgroundService.this, "Entered: "+s, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -194,7 +191,6 @@ public class BackgroundService extends Service implements SensorEventListener{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent,flags,startId);
-        lastSteps = intent.getFloatExtra(EXTRA_STEPS, lastSteps);
         entryCounts.put(FULLER, intent.getIntExtra(EXTRA_FULLER, getEntryCount(FULLER)));
         entryCounts.put(GORDON, intent.getIntExtra(EXTRA_GORDON, getEntryCount(GORDON)));
         return START_STICKY;
@@ -206,10 +202,10 @@ public class BackgroundService extends Service implements SensorEventListener{
             Log.i("SEV","Sensor Event");
             switch (sensorEvent.sensor.getType()){
                 case Sensor.TYPE_STEP_COUNTER:
-                    if (markedSteps==0){
-                        markedSteps = sensorEvent.values[0];
+                    if(!StepCounter.getInstance().isCalibrated()) {
+                        StepCounter.getInstance().calibrate((int) sensorEvent.values[0]);
                     }
-                    lastSteps = sensorEvent.values[0];
+                    StepCounter.getInstance().setNumSteps((int) sensorEvent.values[0]);
                     checkZone();
                     break;
                 default:
@@ -219,7 +215,7 @@ public class BackgroundService extends Service implements SensorEventListener{
     }
 
     private void checkZone() {
-        if (this.getSteps()>=6){
+        if(StepCounter.getInstance().getNumSteps() >= 6){
             if (!this.geoIn.isEmpty()){
                 for (String s : this.geoIn){
                     int i =  this.getEntryCount(s);
@@ -235,13 +231,13 @@ public class BackgroundService extends Service implements SensorEventListener{
 
     }
 
-    public float getSteps(){
-        return lastSteps - markedSteps;
-    }
+//    public float getSteps(){
+//        return lastSteps - markedSteps;
+//    }
 
-    public void markSteps(){
-        markedSteps = lastSteps;
-    }
+//    public void markSteps(){
+//        markedSteps = lastSteps;
+//    }
 
     public String getActivityName(){
         String name = "doing something";

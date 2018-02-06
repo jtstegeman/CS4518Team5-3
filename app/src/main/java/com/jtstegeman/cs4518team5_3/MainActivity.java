@@ -26,12 +26,10 @@ import java.util.concurrent.ScheduledFuture;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BUNDLE_STEPS = "steps";
     private static final String BUNDLE_FULLER_COUNT = "fuller_count";
     private static final String BUNDLE_LIBRARY_COUNT = "library_count";
     private BackgroundService mService;
     private boolean mBound=false;
-    private float steps = 0.0f;
     private int fuller = 0;
     private int gordon = 0;
     ScheduledFuture<?> updateActions=null;
@@ -44,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        steps = savedInstanceState.getFloat(BUNDLE_STEPS, 0.0f);
         fuller = savedInstanceState.getInt(BUNDLE_FULLER_COUNT, 0);
         gordon = savedInstanceState.getInt(BUNDLE_LIBRARY_COUNT, 0);
     }
@@ -92,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runBackgroundService(){
-        Intent intent = BackgroundService.makeIntent(this, steps, fuller, gordon);
+        Intent intent = BackgroundService.makeIntent(this, fuller, gordon);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -100,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if(mBound) {
-            steps = mService.getSteps();
             fuller = mService.getEntryCount(BackgroundService.FULLER);
             gordon = mService.getEntryCount(BackgroundService.GORDON);
 
@@ -127,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         if (mService != null) {
-            savedInstanceState.putFloat(BUNDLE_STEPS, steps);
             savedInstanceState.putInt(BUNDLE_FULLER_COUNT, fuller);
             savedInstanceState.putInt(BUNDLE_LIBRARY_COUNT, gordon);
         }
@@ -135,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
     void updateUI() {
         if (mService != null) {
-            stepCount.setText("Steps: " + mService.getSteps());
+            stepCount.setText("Steps: " + StepCounter.getInstance().getNumSteps());
             curAct.setText(mService.getActivityName());
             switch (mService.getCurrentActivity()) {
                 case DetectedActivity.STILL:
