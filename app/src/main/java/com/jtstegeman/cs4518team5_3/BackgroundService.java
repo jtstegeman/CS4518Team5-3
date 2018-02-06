@@ -232,13 +232,13 @@ public class BackgroundService extends Service implements SensorEventListener{
         String name = "doing something";
         switch (this.lastActivity){
             case DetectedActivity.STILL:
-                name = "standing still";
+                name = getResources().getString(R.string.still);
                 break;
             case DetectedActivity.RUNNING:
-                name = "running";
+                name = getResources().getString(R.string.running);
                 break;
             case DetectedActivity.WALKING:
-                name = "walking";
+                name = getResources().getString(R.string.walking);
                 break;
             default:
                 break;

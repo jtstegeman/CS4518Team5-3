@@ -10,7 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.location.DetectedActivity;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     ScheduledFuture<?> updateActions=null;
     TextView stepCount;
     TextView curAct;
+    TextView fullerCount;
+    TextView libraryCount;
+    ImageView activityDisplay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         stepCount = (TextView) findViewById(R.id.stepCount);
         curAct = (TextView) findViewById(R.id.curActiv);
+        fullerCount = (TextView) findViewById(R.id.fullerCount);
+        libraryCount = (TextView) findViewById(R.id.libraryCount);
+        activityDisplay = (ImageView) findViewById(R.id.activityDisplay);
         updateUI();
     }
 
@@ -57,6 +66,17 @@ public class MainActivity extends AppCompatActivity {
         if (mService != null) {
             stepCount.setText("Steps: " + mService.getSteps());
             curAct.setText(mService.getActivityName());
+            switch (mService.getCurrentActivity()) {
+                case DetectedActivity.STILL:
+                    activityDisplay.setImageDrawable(getDrawable(R.drawable.still));
+                    break;
+                case DetectedActivity.WALKING:
+                    activityDisplay.setImageDrawable(getDrawable(R.drawable.walking));
+                    break;
+                case DetectedActivity.RUNNING:
+                    activityDisplay.setImageDrawable(getDrawable(R.drawable.running));
+                    break;
+            }
         }
         else {
             stepCount.setText("Waiting");

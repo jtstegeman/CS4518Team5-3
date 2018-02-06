@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CS4518Team5-3</string>
+    <string name="fuller_geo">Visits to Fuller Labs geoFence:</string>
+    <string name="library_geo">Visits to Library geoFence:</string>
+    <string name="still">You are standing still</string>
+    <string name="walking">You are walking</string>
+    <string name="running">You are running</string>
 </resources>
