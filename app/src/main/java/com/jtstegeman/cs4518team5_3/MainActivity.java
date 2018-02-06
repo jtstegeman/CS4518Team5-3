@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
                     activityDisplay.setImageDrawable(getDrawable(R.drawable.running));
                     break;
             }
+            fullerCount.setText(mService.getEntryCount(BackgroundService.FULLER));
+            libraryCount.setText(mService.getEntryCount(BackgroundService.GORDON));
         }
         else {
             stepCount.setText("Waiting");
