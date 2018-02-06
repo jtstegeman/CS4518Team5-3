@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
                 googleMap.setMyLocationEnabled(true);
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setBuildingsEnabled(true);
-                googleMap.moveCamera(CameraUpdateFactory.zoomTo(16));
                 map = googleMap;
             }
         });
