@@ -1,17 +1,22 @@
 package com.jtstegeman.cs4518team5_3;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.icu.util.TimeUnit;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
 
@@ -41,25 +46,78 @@ public class MainActivity extends AppCompatActivity {
         fullerCount = (TextView) findViewById(R.id.fullerCount);
         libraryCount = (TextView) findViewById(R.id.libraryCount);
         activityDisplay = (ImageView) findViewById(R.id.activityDisplay);
+
+        requestPermission();
+
         updateUI();
+    }
+
+    private void requestPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        1);
+
+        }
+
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    runBackgroundService();
+
+                } else {
+
+                   finish();
+                }
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
+
+
+
+    private void runBackgroundService(){
+        Intent intent = new Intent(this, BackgroundService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unbindService(mConnection);
-        mBound=false;
-        mService=null;
-        if (updateActions!=null){
-            updateActions.cancel(true);
+        if(mBound) {
+            unbindService(mConnection);
+            mBound = false;
+            mService = null;
+            if (updateActions != null) {
+                updateActions.cancel(true);
+            }
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent = new Intent(this, BackgroundService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        if(ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            runBackgroundService();
+        }
     }
 
     void updateUI() {
@@ -77,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
                     activityDisplay.setImageDrawable(getDrawable(R.drawable.running));
                     break;
             }
-            fullerCount.setText(mService.getEntryCount(BackgroundService.FULLER));
-            libraryCount.setText(mService.getEntryCount(BackgroundService.GORDON));
+            fullerCount.setText(String.valueOf(mService.getEntryCount(BackgroundService.FULLER)));
+            libraryCount.setText(String.valueOf(mService.getEntryCount(BackgroundService.GORDON)));
         }
         else {
             stepCount.setText("Waiting");
