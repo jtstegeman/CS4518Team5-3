@@ -123,7 +123,7 @@ public class BackgroundService extends Service implements SensorEventListener{
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
         builder.addGeofence(new Geofence.Builder()
                 .setRequestId(GORDON)
-                .setCircularRegion(42.274249, -71.806660,500)
+                .setCircularRegion(42.274249, -71.806660,5)
                 //Front door of Library
                 .setExpirationDuration(1000).setNotificationResponsiveness(0)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
@@ -131,7 +131,7 @@ public class BackgroundService extends Service implements SensorEventListener{
                 .build());
         builder.addGeofence(new Geofence.Builder()
                 .setRequestId(FULLER)
-                .setCircularRegion(42.274879, -71.806681,50)
+                .setCircularRegion(42.274879, -71.806681,5)
                 //Front door of Fuller
                 .setExpirationDuration(1000).setNotificationResponsiveness(0)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
