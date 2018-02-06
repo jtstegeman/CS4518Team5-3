@@ -39,6 +39,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
         Log.i("GEO", "ALERT");
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
+
+
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             for (Geofence f : triggeringGeofences) {

@@ -102,12 +102,14 @@ public class BackgroundService extends Service implements SensorEventListener{
                             Toast.makeText(BackgroundService.this, "Entered: "+s, Toast.LENGTH_LONG).show();
                         }
                     }
-                    in.clear();
-                    in.addAll(in);
+                    geoIn.clear();
+                    geoIn.addAll(in);
                 }
             }
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(INTENT_STR));
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(GEO_NAME));
+
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         try {
             mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent());
@@ -121,7 +123,7 @@ public class BackgroundService extends Service implements SensorEventListener{
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
         builder.addGeofence(new Geofence.Builder()
                 .setRequestId(GORDON)
-                .setCircularRegion(42.274249, -71.806660,50)
+                .setCircularRegion(42.274249, -71.806660,500)
                 //Front door of Library
                 .setExpirationDuration(1000).setNotificationResponsiveness(0)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
