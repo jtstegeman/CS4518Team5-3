@@ -44,6 +44,8 @@
         android:layout_height="wrap_content"
         android:text="Hello World!" />
 
+
+
     <ImageView
         android:id="@+id/activityDisplay"
         android:layout_width="match_parent"
@@ -51,8 +53,7 @@
         android:layout_weight="1"
         android:padding="8dp"
         android:scaleType="centerInside"
-        android:adjustViewBounds="true"
-        android:src="@drawable/still"/>
+        android:adjustViewBounds="true" />
 
     <TextView
         android:id="@+id/curActiv"
