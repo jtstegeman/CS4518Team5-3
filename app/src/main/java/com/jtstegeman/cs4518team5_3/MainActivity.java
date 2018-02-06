@@ -22,7 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String BUNDLE_FULLER_COUNT = "fuller_count";
     private static final String BUNDLE_LIBRARY_COUNT = "library_count";
     private BackgroundService mService;
-    private boolean mBound=false;
+    private boolean mBound = false;
     private int fuller = 0;
     private int gordon = 0;
-    ScheduledFuture<?> updateActions=null;
+    ScheduledFuture<?> updateActions = null;
     TextView stepCount;
     TextView curAct;
     TextView fullerCount;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     LocationManager locationManager;
     Intent intent = null;
     LocationListener locationListener;
+    GoogleMap map;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -73,18 +76,54 @@ public class MainActivity extends AppCompatActivity {
                 makeUseOfNewLocation(location);
             }
 
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
 
-            public void onProviderEnabled(String provider) {}
+            public void onProviderEnabled(String provider) {
+            }
 
-            public void onProviderDisabled(String provider) {}
+            public void onProviderDisabled(String provider) {
+            }
         };
 
+        myLocation.onCreate(savedInstanceState);
+        myLocation.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                System.out.println("HERE");
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                googleMap.setMyLocationEnabled(true);
+                googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                googleMap.setBuildingsEnabled(true);
+                map = googleMap;
+            }
+        });
         requestPermission();
 
 
 
         updateUI();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        myLocation.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        myLocation.onStop();
     }
 
     private void requestPermission(){
@@ -120,8 +159,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        myLocation.onLowMemory();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        myLocation.onPause();
         if(mBound) {
             fuller = mService.getEntryCount(BackgroundService.FULLER);
             gordon = mService.getEntryCount(BackgroundService.GORDON);
@@ -139,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        myLocation.onResume();
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
@@ -152,11 +199,13 @@ public class MainActivity extends AppCompatActivity {
         double lon = location.getLongitude();
 
 
+
     }
 
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
+        myLocation.onSaveInstanceState(savedInstanceState);
         super.onSaveInstanceState(savedInstanceState);
         if (mService != null) {
             savedInstanceState.putInt(BUNDLE_FULLER_COUNT, fuller);
@@ -210,4 +259,10 @@ public class MainActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myLocation.onDestroy();
+    }
 }

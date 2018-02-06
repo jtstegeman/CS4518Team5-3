@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">CS4518Team5-3</string>
-    <string name="google_maps_key">AIzaSyCc0_1EEjP11TLnPkVsX1OYIY7oBa9XsXs</string>
+    <string name="google_maps_key">AIzaSyDfsCirleMY2uyOT37KihPPvd_Ay5PXPvU</string>
     <string name="fuller_geo">Visits to Fuller Labs geoFence:</string>
     <string name="library_geo">Visits to Library geoFence:</string>
     <string name="still">You are standing still</string>
