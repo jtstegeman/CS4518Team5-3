@@ -39,6 +39,10 @@ public class BackgroundService extends Service implements SensorEventListener{
     public static final String FULLER = "Fuller";
     public static final String GORDON = "Gordon Library";
 
+    private static final String EXTRA_STEPS = "steps";
+    private static final String EXTRA_FULLER = "Fuller";
+    private static final String EXTRA_GORDON = "Gordon Library";
+
     public ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
     private final IBinder mBinder = new BackgroundBinder();
     private float markedSteps=0;
@@ -55,6 +59,14 @@ public class BackgroundService extends Service implements SensorEventListener{
     private PendingIntent mGeofencePendingIntent;
     private Set<String> geoIn = new HashSet<>();
     private Map<String, Integer> entryCounts = new HashMap<>();
+
+    public static Intent makeIntent(Context packageContext, float startSteps, int fullerEntryCount, int gordonEntryCount) {
+        Intent intent = new Intent(packageContext, BackgroundService.class);
+        intent.putExtra(EXTRA_STEPS, startSteps);
+        intent.putExtra(EXTRA_FULLER, fullerEntryCount);
+        intent.putExtra(EXTRA_GORDON, gordonEntryCount);
+        return intent;
+    }
 
     public BackgroundService() {
     }
@@ -182,6 +194,9 @@ public class BackgroundService extends Service implements SensorEventListener{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent,flags,startId);
+        lastSteps = intent.getFloatExtra(EXTRA_STEPS, lastSteps);
+        entryCounts.put(FULLER, intent.getIntExtra(EXTRA_FULLER, getEntryCount(FULLER)));
+        entryCounts.put(GORDON, intent.getIntExtra(EXTRA_GORDON, getEntryCount(GORDON)));
         return START_STICKY;
     }
 

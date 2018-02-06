@@ -26,8 +26,9 @@ import java.util.concurrent.ScheduledFuture;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
+    private static final String BUNDLE_STEPS = "steps";
+    private static final String BUNDLE_FULLER_COUNT = "fuller_count";
+    private static final String BUNDLE_LIBRARY_COUNT = "library_count";
     private BackgroundService mService;
     private boolean mBound=false;
     ScheduledFuture<?> updateActions=null;
@@ -36,6 +37,16 @@ public class MainActivity extends AppCompatActivity {
     TextView fullerCount;
     TextView libraryCount;
     ImageView activityDisplay;
+    Intent intent = null;
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        intent = BackgroundService.makeIntent(this,
+                savedInstanceState.getFloat(BUNDLE_STEPS, 0.0f),
+                savedInstanceState.getInt(BUNDLE_FULLER_COUNT, 0),
+                savedInstanceState.getInt(BUNDLE_LIBRARY_COUNT, 0));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +67,10 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
-
-
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         1);
-
         }
-
     }
 
 
@@ -76,24 +82,16 @@ public class MainActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     runBackgroundService();
-
                 } else {
-
                    finish();
                 }
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
-
-
     private void runBackgroundService(){
-        Intent intent = new Intent(this, BackgroundService.class);
+        if (intent == null) intent = new Intent(this, BackgroundService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -117,6 +115,16 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             runBackgroundService();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        if (mService != null) {
+            savedInstanceState.putFloat(BUNDLE_STEPS, mService.getSteps());
+            savedInstanceState.putInt(BUNDLE_FULLER_COUNT, mService.getEntryCount(BackgroundService.FULLER));
+            savedInstanceState.putInt(BUNDLE_LIBRARY_COUNT, mService.getEntryCount(BackgroundService.GORDON));
         }
     }
 
