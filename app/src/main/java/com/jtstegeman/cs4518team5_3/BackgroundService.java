@@ -39,9 +39,6 @@ public class BackgroundService extends Service implements SensorEventListener{
     public static final String FULLER = "Fuller";
     public static final String GORDON = "Gordon Library";
 
-    private static final String EXTRA_FULLER = "Fuller";
-    private static final String EXTRA_GORDON = "Gordon Library";
-
     public ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
     private final IBinder mBinder = new BackgroundBinder();
     private SensorManager sensorManager;
@@ -55,14 +52,8 @@ public class BackgroundService extends Service implements SensorEventListener{
     private GeofencingClient mGeofencingClient;
     private PendingIntent mGeofencePendingIntent;
     private Set<String> geoIn = new HashSet<>();
-    private Map<String, Integer> entryCounts = new HashMap<>();
-
-    public static Intent makeIntent(Context packageContext, int fullerEntryCount, int gordonEntryCount) {
-        Intent intent = new Intent(packageContext, BackgroundService.class);
-        intent.putExtra(EXTRA_FULLER, fullerEntryCount);
-        intent.putExtra(EXTRA_GORDON, gordonEntryCount);
-        return intent;
-    }
+    //private Map<String, Integer> entryCounts = new HashMap<>();
+    private EntryCounter entryCounter;
 
     public BackgroundService() {
     }
@@ -76,6 +67,7 @@ public class BackgroundService extends Service implements SensorEventListener{
     @Override
     public void onCreate() {
         super.onCreate();
+        entryCounter = EntryCounter.getInstance();
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor countSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         if (countSensor!=null)
@@ -195,8 +187,6 @@ public class BackgroundService extends Service implements SensorEventListener{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent,flags,startId);
-        entryCounts.put(FULLER, intent.getIntExtra(EXTRA_FULLER, getEntryCount(FULLER)));
-        entryCounts.put(GORDON, intent.getIntExtra(EXTRA_GORDON, getEntryCount(GORDON)));
         return START_STICKY;
     }
 
@@ -222,8 +212,8 @@ public class BackgroundService extends Service implements SensorEventListener{
         if(StepCounter.getInstance().getNumSteps() >= 6){
             if (!this.geoIn.isEmpty()){
                 for (String s : this.geoIn){
-                    int i =  this.getEntryCount(s);
-                    this.entryCounts.put(s, i+1);
+                    int i =  this.entryCounter.getEntryCount(s);
+                    this.entryCounter.put(s, i+1);
                     Toast.makeText(this, "6 Steps into zone: '"+s+"', incrementing count",Toast.LENGTH_LONG).show();
                 }
             }
@@ -263,12 +253,5 @@ public class BackgroundService extends Service implements SensorEventListener{
 
     public int getCurrentActivity(){
         return this.lastActivity;
-    }
-
-    public int getEntryCount(String zoneId){
-        Integer i = entryCounts.get(zoneId);
-        if (i==null)
-            return 0;
-        return i;
     }
 }
