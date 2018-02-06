@@ -45,6 +45,14 @@
         android:text="Hello World!" />
 
 
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/myLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"/>
 
     <ImageView
         android:id="@+id/activityDisplay"

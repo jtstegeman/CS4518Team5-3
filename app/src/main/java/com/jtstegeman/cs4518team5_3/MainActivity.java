@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.icu.util.TimeUnit;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,10 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.maps.MapView;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     TextView fullerCount;
     TextView libraryCount;
     ImageView activityDisplay;
+    MapView myLocation;
+    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    Intent intent = null;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -55,8 +63,12 @@ public class MainActivity extends AppCompatActivity {
         fullerCount = (TextView) findViewById(R.id.fullerCount);
         libraryCount = (TextView) findViewById(R.id.libraryCount);
         activityDisplay = (ImageView) findViewById(R.id.activityDisplay);
+        myLocation = (MapView) findViewById(R.id.myLocation);
+
 
         requestPermission();
+
+
 
         updateUI();
     }
@@ -106,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             if (updateActions != null) {
                 updateActions.cancel(true);
             }
+            locationManager.removeUpdates(locationListener);
         }
     }
 
@@ -116,8 +129,31 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             runBackgroundService();
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         }
     }
+
+    // Define a listener that responds to location updates
+    LocationListener locationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            // Called when a new location is found by the network location provider.
+           makeUseOfNewLocation(location);
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+        public void onProviderEnabled(String provider) {}
+
+        public void onProviderDisabled(String provider) {}
+    };
+
+    private void makeUseOfNewLocation(Location location) {
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+
+
+    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
