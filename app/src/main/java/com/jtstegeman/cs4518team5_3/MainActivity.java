@@ -36,12 +36,8 @@ import java.util.concurrent.ScheduledFuture;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BUNDLE_FULLER_COUNT = "fuller_count";
-    private static final String BUNDLE_LIBRARY_COUNT = "library_count";
     private BackgroundService mService;
     private boolean mBound = false;
-    private int fuller = 0;
-    private int gordon = 0;
     ScheduledFuture<?> updateActions = null;
     TextView stepCount;
     TextView curAct;
@@ -53,13 +49,6 @@ public class MainActivity extends AppCompatActivity {
     Intent intent = null;
     LocationListener locationListener;
     GoogleMap map;
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        fuller = savedInstanceState.getInt(BUNDLE_FULLER_COUNT, 0);
-        gordon = savedInstanceState.getInt(BUNDLE_LIBRARY_COUNT, 0);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,9 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         requestPermission();
-
-
-
         updateUI();
     }
 
@@ -168,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runBackgroundService(){
-        Intent intent = BackgroundService.makeIntent(this, fuller, gordon);
+        Intent intent = new Intent(this, BackgroundService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -223,10 +209,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         myLocation.onSaveInstanceState(savedInstanceState);
         super.onSaveInstanceState(savedInstanceState);
-        if (mService != null) {
-            savedInstanceState.putInt(BUNDLE_FULLER_COUNT, fuller);
-            savedInstanceState.putInt(BUNDLE_LIBRARY_COUNT, gordon);
-        }
     }
 
     void updateUI() {
