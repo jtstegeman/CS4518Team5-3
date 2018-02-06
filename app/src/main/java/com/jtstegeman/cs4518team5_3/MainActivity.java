@@ -44,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
     TextView libraryCount;
     ImageView activityDisplay;
     MapView myLocation;
-    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    LocationManager locationManager;
     Intent intent = null;
+    LocationListener locationListener;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -65,6 +66,19 @@ public class MainActivity extends AppCompatActivity {
         activityDisplay = (ImageView) findViewById(R.id.activityDisplay);
         myLocation = (MapView) findViewById(R.id.myLocation);
 
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+                makeUseOfNewLocation(location);
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            public void onProviderEnabled(String provider) {}
+
+            public void onProviderDisabled(String provider) {}
+        };
 
         requestPermission();
 
@@ -132,20 +146,6 @@ public class MainActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         }
     }
-
-    // Define a listener that responds to location updates
-    LocationListener locationListener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            // Called when a new location is found by the network location provider.
-           makeUseOfNewLocation(location);
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-        public void onProviderEnabled(String provider) {}
-
-        public void onProviderDisabled(String provider) {}
-    };
 
     private void makeUseOfNewLocation(Location location) {
         double lat = location.getLatitude();
