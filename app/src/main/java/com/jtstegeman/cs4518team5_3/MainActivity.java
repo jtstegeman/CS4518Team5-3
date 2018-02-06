@@ -169,9 +169,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         myLocation.onPause();
         if(mBound) {
-            fuller = mService.getEntryCount(BackgroundService.FULLER);
-            gordon = mService.getEntryCount(BackgroundService.GORDON);
-
             unbindService(mConnection);
             mBound = false;
                 mService = null;

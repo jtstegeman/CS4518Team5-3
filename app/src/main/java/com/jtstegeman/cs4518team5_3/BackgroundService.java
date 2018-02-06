@@ -262,4 +262,8 @@ public class BackgroundService extends Service implements SensorEventListener{
     public int getCurrentActivity(){
         return this.lastActivity;
     }
+
+    public int getEntryCount(String zoneId) {
+        return entryCounter.getEntryCount(zoneId);
+    }
 }
