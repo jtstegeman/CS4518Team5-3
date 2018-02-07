@@ -224,6 +224,7 @@ public class BackgroundService extends Service implements SensorEventListener{
                     this.entryCounter.put(s, i+1);
                     Toast.makeText(this, "6 Steps into zone: '"+s+"', incrementing count",Toast.LENGTH_LONG).show();
                 }
+                this.geoIn.clear();
             }
         }
     }
